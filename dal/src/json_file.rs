@@ -5,7 +5,7 @@ use std::{
     io::{Read, Write},
 };
 
-use serde::{Deserialize, Serialize, de::DeserializeOwned};
+use serde::{Serialize, de::DeserializeOwned};
 
 fn get_handle(path: Option<&str>) -> Result<File, String> {
     let path = match path {

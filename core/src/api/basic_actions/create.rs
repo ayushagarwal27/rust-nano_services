@@ -1,4 +1,5 @@
 use core::fmt;
+use to_do_dal::json_file::save_one;
 
 use crate::{
     enums::TaskStatus,
@@ -19,9 +20,11 @@ impl fmt::Display for ItemTypes {
     }
 }
 
-pub fn create(title: &str, status: TaskStatus) -> ItemTypes {
+pub fn create(title: &str, status: TaskStatus) -> Result<ItemTypes, String> {
+    let _ = save_one(&title.to_string(), &status)?;
+
     match status {
-        TaskStatus::PENDING => ItemTypes::Pending(Pending::new(title)),
-        TaskStatus::DONE => ItemTypes::Done(Done::new(title)),
+        TaskStatus::PENDING => Ok(ItemTypes::Pending(Pending::new(title))),
+        TaskStatus::DONE => Ok(ItemTypes::Done(Done::new(title))),
     }
 }
