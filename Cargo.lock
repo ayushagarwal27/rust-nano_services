@@ -1292,6 +1292,7 @@ name = "to-do-actix-server"
 version = "0.1.0"
 dependencies = [
  "actix-web",
+ "to-do-core",
  "tokio",
 ]
 
