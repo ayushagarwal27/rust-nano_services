@@ -17,7 +17,6 @@ fn get_handle(path: Option<&str>) -> Result<File, String> {
         .read(true)
         .write(true)
         .create(true)
-        .truncate(true)
         .open(path)
         .map_err(|e| format!("Error opening file: {}", e))?;
     Ok(file)
@@ -32,6 +31,7 @@ pub fn get_all<T: DeserializeOwned>() -> Result<HashMap<String, T>, String> {
 
     let tasks: HashMap<String, T> =
         serde_json::from_str(&contents).map_err(|e| format!("Error parsing JSON: {}", e))?;
+
     Ok(tasks)
 }
 
