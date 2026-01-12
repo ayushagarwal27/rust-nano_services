@@ -1,7 +1,4 @@
-use actix_web::{
-    HttpResponse,
-    web::{self, ServiceConfig, scope},
-};
+use actix_web::web::{self, ServiceConfig, scope};
 
 pub mod create;
 pub mod delete;

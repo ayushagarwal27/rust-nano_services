@@ -2,7 +2,8 @@
 resolver = "2"
 
 members = [
-    "core",
-    "dal",
-    "networking/actix_server"
+    "glue",
+    "nanoservices/core",
+    "nanoservices/dal",
+    "nanoservices/networking/actix_server"
 ]
