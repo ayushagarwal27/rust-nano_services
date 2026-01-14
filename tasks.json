@@ -1,10 +1,14 @@
 {
-  "coding": {
-    "title": "coding",
-    "status": "DONE"
-  },
   "washing": {
     "title": "washing",
     "status": "PENDING"
+  },
+  "writing": {
+    "title": "writing",
+    "status": "DONE"
+  },
+  "coding": {
+    "title": "coding",
+    "status": "DONE"
   }
 }
