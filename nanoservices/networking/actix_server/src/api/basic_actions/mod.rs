@@ -10,6 +10,7 @@ pub fn basic_actions_factory(app: &mut ServiceConfig) {
         scope("/api/v1")
             .route("/get/all", web::get().to(get::get_all))
             .route("/get/{name}", web::get().to(get::get_by_name))
-            .route("/create", web::post().to(create::create)),
+            .route("/create", web::post().to(create::create))
+            .route("/delete/{name}", web::delete().to(delete::delete)),
     );
 }

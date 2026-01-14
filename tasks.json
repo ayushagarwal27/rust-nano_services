@@ -3,12 +3,12 @@
     "title": "washing",
     "status": "PENDING"
   },
-  "writing": {
-    "title": "writing",
-    "status": "DONE"
-  },
   "coding": {
     "title": "coding",
     "status": "DONE"
+  },
+  "writing": {
+    "title": "writing",
+    "status": "PENDING"
   }
 }
