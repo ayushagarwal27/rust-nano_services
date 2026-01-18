@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "scripts": {
     "build": "node esbuild.js",
-    "serve": "serve public"
+    "serve": "serve public",
+    "wasm": "cd rust-interface && sudo wasm-pack build --target web && cp pkg/rust_interface_bg.wasm ../public/rust_interface_bg.wasm",
+    "wasm-trace": "cd public && wasm2wat rust_interface_bg.wasm > rust_interface_bg.wat"
   },
   "dependencies": {
     "react": "^18.2.0",
