@@ -6,10 +6,16 @@ import { ToDoItems } from "./interfaces/toDoItems";
 import { ToDoItem } from "./components/ToDoItem";
 import { CreateToDoItem } from "./components/CreateItemForm";
 import "./App.css";
+import init, {
+  rust_generate_button_text,
+} from "../rust-interface/pkg/rust_interface.js";
 
 const App = () => {
   const [data, setData] = useState(null);
   const [error, setError] = useState(null); // State to store error messages
+  const [wasmReady, setWasmReady] = useState<boolean>(false);
+  const [RustGenerateButtonText, setRustGenerateButtonText] =
+    useState<(input: string) => string>(null);
 
   function reRenderItems(response: any) {
     if (response.error) {
@@ -24,16 +30,20 @@ const App = () => {
   }
 
   React.useEffect(() => {
-    const fetchData = async () => {
-      const response = await getAll();
-      if (response.error) {
-        setError(response.error); // Set error if response contains an error
-      } else {
-        setData(response.data); // Set data if response is successful
-      }
-    };
-    fetchData();
+    init()
+      .then(() => {
+        setRustGenerateButtonText(() => rust_generate_button_text);
+        setWasmReady(true);
+      })
+      .catch((e) => console.error("Error initializing WASM: ", e));
   }, []);
+
+  React.useEffect(() => {
+    const fetchData = async () => {};
+    if (wasmReady) {
+      fetchData();
+    }
+  }, [wasmReady]);
 
   if (error) {
     return <div style={{ color: "red" }}>Error: {error}</div>;
@@ -56,6 +66,7 @@ const App = () => {
                 title={item.title}
                 status={item.status}
                 id={item.id}
+                buttonMessage={RustGenerateButtonText(item.status)}
                 passBackResponse={reRenderItems}
               />
             </>
@@ -70,6 +81,7 @@ const App = () => {
                 title={item.title}
                 status={item.status}
                 id={item.id}
+                buttonMessage={RustGenerateButtonText(item.status)}
                 passBackResponse={reRenderItems}
               />
             </>

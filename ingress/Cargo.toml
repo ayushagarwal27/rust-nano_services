@@ -8,3 +8,5 @@ rust-embed = "8.3.0"
 mime_guess = "2.0.4"
 actix-web = "4.5.1"
 tokio = { version = "1.35.0", features = ["macros", "rt-multi-thread"] }
+to_do_server = {path = "../nanoservices/networking/actix_server", package = "to-do-actix-server"}
+actix-cors="0.7.0"

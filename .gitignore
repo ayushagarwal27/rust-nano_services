@@ -1,2 +1,3 @@
 /target
 **/node_modules/
+/ingress/frontend/public

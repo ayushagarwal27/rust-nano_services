@@ -6,5 +6,7 @@ members = [
     "ingress",
     "nanoservices/core",
     "nanoservices/dal",
+    "ingress/frontend/rust-interface",
     "nanoservices/networking/actix_server"
 ]
+

@@ -1,0 +1,18 @@
+{
+  "coding": {
+    "title": "coding",
+    "status": "DONE"
+  },
+  "writing": {
+    "title": "writing",
+    "status": "PENDING"
+  },
+  "cycling": {
+    "title": "cycling",
+    "status": "PENDING"
+  },
+  "washing": {
+    "title": "washing",
+    "status": "PENDING"
+  }
+}
