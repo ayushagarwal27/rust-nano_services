@@ -6,8 +6,15 @@ edition = "2024"
 
 [features]
 json-file = ["serde_json", "serde"]
+sqlx-postgres = ["sqlx", "once_cell"]
 
 [dependencies]
-serde_json = { version="1.0.114", optional = true }
 serde = { version="1.0.197", optional = true }
 glue={path = "../../glue"}
+
+# for json-file
+serde_json ={ version="1.0.114", optional = true }
+
+# for sqlx-postgres
+sqlx = { version = "0.8.3", features = ["postgres", "json"], optional = true }
+once_cell = { version = "1.19.0", optional = true}
