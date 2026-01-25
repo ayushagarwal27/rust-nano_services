@@ -1,12 +1,23 @@
 #!/usr/bin/env bash
-# File: ingress/scripts/run_server.sh
-# navigate to directory
-SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
-cd $SCRIPTPATH
-cd ..
-cd frontend
-npm install
-npm run build
-cd ..
-cargo clean
-cargo run
+set -e
+
+# Resolve paths safely
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+INGRESS_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+
+echo "Ingress dir: $INGRESS_DIR"
+
+# ---------- Frontend ----------
+if [ -d "$INGRESS_DIR/frontend" ]; then
+  echo "Starting frontend..."
+  cd "$INGRESS_DIR/frontend"
+  npm install
+  npm run dev &
+else
+  echo "No frontend directory found, skipping frontend"
+fi
+
+# ---------- Backend ----------
+echo "Starting backend..."
+cd "$INGRESS_DIR"
+cargo run --bin ingress

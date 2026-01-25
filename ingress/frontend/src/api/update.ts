@@ -1,5 +1,5 @@
 import { ToDoItem, ToDoItems, TaskStatus } from "../interfaces/toDoItems";
-import { putCall } from "./utils";
+import { patchCall } from "./utils";
 import { Url } from "./urls";
 
 export async function updateToDoItemCall(name: string, status: TaskStatus) {
@@ -7,5 +7,5 @@ export async function updateToDoItemCall(name: string, status: TaskStatus) {
     title: name,
     status: status,
   };
-  return putCall<ToDoItem, ToDoItems>(new Url().update, toDoItem, 200);
+  return patchCall<ToDoItem, ToDoItems>(new Url().update, toDoItem, 200);
 }

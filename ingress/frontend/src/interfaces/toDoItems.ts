@@ -1,3 +1,4 @@
+// File: frontend/src/interfaces/toDoItems.ts
 export enum TaskStatus {
   PENDING = "PENDING",
   DONE = "DONE",

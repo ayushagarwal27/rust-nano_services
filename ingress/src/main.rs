@@ -4,6 +4,7 @@ use actix_web::{App, HttpRequest, HttpResponse, HttpServer, Responder, web};
 use rust_embed::RustEmbed;
 
 use actix_cors::Cors;
+use to_do_dal::migrations::run_migrations as run_to_do_migrations;
 use to_do_server::api::views_factory as to_do_views_factory;
 
 async fn index() -> HttpResponse {
@@ -50,6 +51,8 @@ async fn catch_all(req: HttpRequest) -> impl Responder {
 
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
+    dotenvy::dotenv().ok();
+    run_to_do_migrations().await;
     HttpServer::new(|| {
         let cors = Cors::default()
             .allow_any_origin()

@@ -17,5 +17,6 @@ glue={path = "../../glue"}
 serde_json ={ version="1.0.114", optional = true }
 
 # for sqlx-postgres
-sqlx = { version = "0.8.3", features = ["postgres", "json"], optional = true }
+sqlx = { version = "0.8.3", features = ["postgres", "json", "runtime-tokio-rustls",
+    "macros"], optional = true }
 once_cell = { version = "1.19.0", optional = true}
