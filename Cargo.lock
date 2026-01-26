@@ -296,6 +296,26 @@ dependencies = [
 ]
 
 [[package]]
+name = "auth-actix-server"
+version = "0.1.0"
+dependencies = [
+ "actix-web",
+ "auth-core",
+ "auth-dal",
+ "glue",
+ "tokio",
+]
+
+[[package]]
+name = "auth-core"
+version = "0.1.0"
+dependencies = [
+ "auth-dal",
+ "glue",
+ "serde",
+]
+
+[[package]]
 name = "auth-dal"
 version = "0.1.0"
 dependencies = [
