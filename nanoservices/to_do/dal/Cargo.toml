@@ -1,7 +1,7 @@
 [package]
 name = "to-do-dal"
 version = "0.1.0"
-edition = "2024"
+edition = "2021"
 
 
 [features]
@@ -11,7 +11,7 @@ default = ["sqlx-postgres"]
 
 [dependencies]
 serde = { version="1.0.197", optional = true }
-glue={path = "../../glue"}
+glue={path = "../../../glue"}
 
 # for json-file
 serde_json ={ version="1.0.114", optional = true }
