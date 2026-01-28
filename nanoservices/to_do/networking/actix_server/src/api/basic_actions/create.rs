@@ -1,6 +1,6 @@
 use to_do_core::api::basic_actions::{create::create as create_core, get::get_all as get_all_core};
 
-use actix_web::{HttpResponse, web::Json};
+use actix_web::{web::Json, HttpResponse};
 use glue::{errors::NanoServiceError, token::HeaderToken};
 use to_do_dal::to_do_items::{
     schema::NewToDoItem,
@@ -11,7 +11,6 @@ pub async fn create<T: SaveOne + GetAll>(
     token: HeaderToken,
     body: Json<NewToDoItem>,
 ) -> Result<HttpResponse, NanoServiceError> {
-    println!("Token: {}", token.message);
     let _ = create_core::<T>(body.into_inner()).await?;
     Ok(HttpResponse::Created().json(get_all_core::<T>().await?))
 }
