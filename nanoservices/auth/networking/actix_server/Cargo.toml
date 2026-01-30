@@ -9,3 +9,4 @@ actix-web = "4.5.1"
 auth-core = { path = "../../core" }
 auth-dal = { path = "../../dal" }
 glue = { path = "../../../../glue", features = ["actix"] }
+base64 = "0.22.1"

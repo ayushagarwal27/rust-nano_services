@@ -1,22 +1,11 @@
+use crate::extract_auth::extract_credentials;
+use actix_web::{HttpRequest, HttpResponse};
+use auth_core::api::auth::login::login as core_login;
 use auth_dal::users::transactions::get::GetByEmail;
-use glue::errors::{NanoServiceError, NanoServiceErrorStatus};
-use glue::token::HeaderToken;
+use glue::errors::NanoServiceError;
 
-pub async fn login<T: GetByEmail>(
-    email: String,
-    password: String,
-) -> Result<String, NanoServiceError> {
-    let user = T::get_by_email(email).await?;
-    let outcome = user.verify_password(password)?;
-    if outcome {
-        Ok(HeaderToken {
-            unique_id: user.unique_id,
-        }
-        .encode()?)
-    } else {
-        Err(NanoServiceError::new(
-            "Invalid password".to_string(),
-            NanoServiceErrorStatus::Unauthorized,
-        ))
-    }
+pub async fn login<T: GetByEmail>(req: HttpRequest) -> Result<HttpResponse, NanoServiceError> {
+    let credentials = extract_credentials(req).await?;
+    let token = core_login::<T>(credentials.email, credentials.password).await?;
+    Ok(HttpResponse::Ok().json(token))
 }
