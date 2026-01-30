@@ -7,6 +7,7 @@ pub async fn login<T: GetByEmail>(
     password: String,
 ) -> Result<String, NanoServiceError> {
     let user = T::get_by_email(email).await?;
+
     let outcome = user.verify_password(password)?;
     if outcome {
         Ok(HeaderToken {

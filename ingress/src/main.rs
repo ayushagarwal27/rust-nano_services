@@ -1,11 +1,14 @@
 use std::path::Path;
 
-use actix_web::{App, HttpRequest, HttpResponse, HttpServer, Responder, web};
+use actix_web::{web, App, HttpRequest, HttpResponse, HttpServer, Responder};
 use rust_embed::RustEmbed;
 
 use actix_cors::Cors;
 use to_do_dal::migrations::run_migrations as run_to_do_migrations;
 use to_do_server::api::views_factory as to_do_views_factory;
+
+use auth_dal::migrations::run_migrations as run_auth_migrations;
+use auth_server::api::views_factory as auth_views_factory;
 
 async fn index() -> HttpResponse {
     HttpResponse::Ok()
@@ -33,26 +36,33 @@ fn serve_frontend_assets(path: String) -> HttpResponse {
 }
 
 async fn catch_all(req: HttpRequest) -> impl Responder {
-    if req.path().contains("api") {
-        return HttpResponse::NotFound().finish();
+    println!("❌ Catch-all hit for path: {}", req.path());
+
+    // Only return 404 for unmatched API routes
+    if req.path().starts_with("/api/") {
+        return HttpResponse::NotFound().body(format!("API endpoint not found: {}", req.path()));
     }
+
     if req.path().contains("frontend/public") {
         return serve_frontend_assets(req.path().to_string());
     }
+
     let file_type = match mime_guess::from_path(&req.path()).first_raw() {
         Some(file_type) => file_type,
         None => "text/html",
     };
+
     if !file_type.contains("text/html") {
         return serve_frontend_assets(req.path().to_string());
     }
+
     index().await
 }
-
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
     dotenvy::dotenv().ok();
     run_to_do_migrations().await;
+    run_auth_migrations().await;
     HttpServer::new(|| {
         let cors = Cors::default()
             .allow_any_origin()
@@ -60,11 +70,15 @@ async fn main() -> std::io::Result<()> {
             .allow_any_header();
 
         App::new()
-            .configure(to_do_views_factory)
             .wrap(cors)
+            .service(
+                web::scope("/api/v1")
+                    .configure(to_do_views_factory)
+                    .configure(auth_views_factory),
+            )
             .default_service(web::route().to(catch_all))
     })
-    .bind("0.0.0.0:8001")?
+    .bind("0.0.0.0:8002")?
     .run()
     .await
 }

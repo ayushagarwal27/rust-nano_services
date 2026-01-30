@@ -17,9 +17,9 @@ impl SaveOne for SqlxPostGresDescriptor {
 async fn sqlx_postgres_save_one(user: NewUser) -> Result<User, NanoServiceError> {
     let user = sqlx::query_as::<_, User>(
         "
-INSERT INTO users (email, password, uniqu
-VALUES ($1, $2, $3)
-RETURNING *",
+        INSERT INTO users (email, password, unique_id)
+        VALUES ($1, $2, $3)
+        RETURNING *",
     )
     .bind(user.email)
     .bind(user.password.to_string())

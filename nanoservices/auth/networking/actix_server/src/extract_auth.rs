@@ -48,7 +48,7 @@ pub async fn extract_credentials(req: HttpRequest) -> Result<Credentials, NanoSe
 
     if parts.len() == 2 {
         let email = parts[0];
-        let password = parts[0];
+        let password = parts[1];
         Ok(Credentials {
             email: email.to_string(),
             password: password.to_string(),

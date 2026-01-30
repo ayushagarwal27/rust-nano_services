@@ -5,7 +5,9 @@ use actix_web::web::{get, scope, ServiceConfig};
 use auth_dal::users::descriptors::SqlxPostGresDescriptor;
 
 pub fn auth_factory(app: &mut ServiceConfig) {
-    app.service(
-        scope("/api/v1/auth").route("login", get().to(login::login::<SqlxPostGresDescriptor>)),
+    println!("Registering auth routes");
+    app.route(
+        "/auth/login",
+        get().to(login::login::<SqlxPostGresDescriptor>),
     );
 }

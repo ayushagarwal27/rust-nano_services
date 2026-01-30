@@ -13,3 +13,6 @@ actix-cors="0.7.0"
 to-do-dal = {path = "../nanoservices/to_do/dal", package = "to-do-dal",features = ["sqlx-postgres"]}
 
 dotenvy = "0.15"
+
+auth_server = { path = "../nanoservices/auth/networking/actix_server", package = "auth-actix-server"}
+auth-dal = { path = "../nanoservices/auth/dal", package = "auth-dal"}
