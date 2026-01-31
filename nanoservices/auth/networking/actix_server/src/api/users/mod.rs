@@ -1,5 +1,7 @@
 pub mod create;
-use actix_web::web::{post, scope, ServiceConfig};
+pub mod get;
+
+use actix_web::web::{self, post, ServiceConfig};
 use auth_dal::users::descriptors::SqlxPostGresDescriptor;
 
 pub fn users_factory(app: &mut ServiceConfig) {
@@ -7,5 +9,9 @@ pub fn users_factory(app: &mut ServiceConfig) {
     app.route(
         "/users/create",
         post().to(create::create::<SqlxPostGresDescriptor>),
+    )
+    .route(
+        "/users/get",
+        web::get().to(get::get_by_unique_id::<SqlxPostGresDescriptor>),
     );
 }
