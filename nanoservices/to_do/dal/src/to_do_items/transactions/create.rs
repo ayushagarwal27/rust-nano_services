@@ -26,6 +26,7 @@ use glue::errors::NanoServiceErrorStatus;
 pub trait SaveOne {
     fn save_one(
         item: NewToDoItem,
+        user_id: i32,
     ) -> impl Future<Output = Result<ToDoItem, NanoServiceError>> + Send;
 }
 
@@ -33,8 +34,9 @@ pub trait SaveOne {
 impl SaveOne for SqlxPostGresDescriptor {
     fn save_one(
         item: NewToDoItem,
+        user_id: i32,
     ) -> impl Future<Output = Result<ToDoItem, NanoServiceError>> + Send {
-        sqlx_postgres_save_one(item)
+        sqlx_postgres_save_one(item, user_id)
     }
 }
 
@@ -42,13 +44,17 @@ impl SaveOne for SqlxPostGresDescriptor {
 impl SaveOne for JsonFileDescriptor {
     fn save_one(
         item: NewToDoItem,
+        user_id: i32,
     ) -> impl Future<Output = Result<ToDoItem, NanoServiceError>> + Send {
-        json_file_save_one(item)
+        json_file_save_one(item, user_id)
     }
 }
 
 #[cfg(feature = "sqlx-postgres")]
-async fn sqlx_postgres_save_one(item: NewToDoItem) -> Result<ToDoItem, NanoServiceError> {
+async fn sqlx_postgres_save_one(
+    item: NewToDoItem,
+    user_id: i32,
+) -> Result<ToDoItem, NanoServiceError> {
     let item = sqlx::query_as::<_, ToDoItem>(
         "
         INSERT INTO to_do_items (title, status)
@@ -60,17 +66,31 @@ async fn sqlx_postgres_save_one(item: NewToDoItem) -> Result<ToDoItem, NanoServi
     .fetch_one(&*SQLX_POSTGRES_POOL)
     .await
     .map_err(|e| NanoServiceError::new(e.to_string(), NanoServiceErrorStatus::Unknown))?;
+
+    sqlx::query(
+        "
+        INSERT INTO user_connections (user_id, to_do_id) 
+        VALUES ($1, $2)",
+    )
+    .bind(user_id)
+    .bind(item.id)
+    .execute(&*SQLX_POSTGRES_POOL)
+    .await
+    .map_err(|e| NanoServiceError::new(e.to_string(), NanoServiceErrorStatus::Unknown))?;
     Ok(item)
 }
 
-async fn json_file_save_one(item: NewToDoItem) -> Result<ToDoItem, NanoServiceError> {
+async fn json_file_save_one(item: NewToDoItem, user_id: i32) -> Result<ToDoItem, NanoServiceError> {
     let mut tasks = get_all::<ToDoItem>().unwrap_or_else(|_| HashMap::new());
     let to_do_item = ToDoItem {
         id: 1,
         title: item.title,
         status: item.status.to_string(),
     };
-    tasks.insert(to_do_item.title.to_string(), to_do_item.clone());
+    tasks.insert(
+        to_do_item.title.to_string() + ":" + &user_id.to_string(),
+        to_do_item.clone(),
+    );
     save_all(&tasks)?;
     Ok(to_do_item)
 }

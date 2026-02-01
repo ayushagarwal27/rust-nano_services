@@ -20,12 +20,14 @@ use glue::errors::NanoServiceErrorStatus;
 pub trait UpdateOne {
     fn update_one(
         item: ToDoItem,
+        user_id: i32,
     ) -> impl Future<Output = Result<ToDoItem, NanoServiceError>> + Send;
 }
 #[cfg(feature = "sqlx-postgres")]
 impl UpdateOne for SqlxPostGresDescriptor {
     fn update_one(
         item: ToDoItem,
+        _user_id: i32,
     ) -> impl Future<Output = Result<ToDoItem, NanoServiceError>> + Send {
         sqlx_postgres_update_one(item)
     }
@@ -34,8 +36,9 @@ impl UpdateOne for SqlxPostGresDescriptor {
 impl UpdateOne for JsonFileDescriptor {
     fn update_one(
         item: ToDoItem,
+        user_id: i32,
     ) -> impl Future<Output = Result<ToDoItem, NanoServiceError>> + Send {
-        json_file_update_one(item)
+        json_file_update_one(item, user_id)
     }
 }
 
@@ -57,15 +60,16 @@ async fn sqlx_postgres_update_one(item: ToDoItem) -> Result<ToDoItem, NanoServic
     Ok(item)
 }
 #[cfg(feature = "json-file")]
-async fn json_file_update_one(item: ToDoItem) -> Result<ToDoItem, NanoServiceError> {
+async fn json_file_update_one(item: ToDoItem, user_id: i32) -> Result<ToDoItem, NanoServiceError> {
     let mut tasks = get_all::<ToDoItem>().unwrap_or_else(|_| HashMap::new());
-    if !tasks.contains_key(&item.title) {
+    let key = item.title.clone() + ":" + &user_id.to_string();
+    if !tasks.contains_key(&key) {
         return Err(NanoServiceError::new(
             format!("Item with name {} not found", item.title),
             NanoServiceErrorStatus::NotFound,
         ));
     }
-    tasks.insert(item.title.clone(), item.clone());
+    tasks.insert(key, item.clone());
     save_all(&tasks)?;
     Ok(item)
 }
