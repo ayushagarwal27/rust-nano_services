@@ -9,3 +9,9 @@ actix-web = "4.9.0"
 to-do-core = {path = "../../core"}
 glue={path = "../../../../glue", features = ["actix"]}
 to-do-dal = {path = "../../dal", features = ["sqlx-postgres"]}
+auth-kernel = { path = "../../../auth/kernel" }
+
+[features]
+auth-http = ["auth-kernel/http"]
+auth-core-postgres = ["auth-kernel/core-postgres"]
+default = ["auth-core-postgres"]
