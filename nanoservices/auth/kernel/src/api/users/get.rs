@@ -31,10 +31,10 @@ pub async fn get_user_by_unique_id(id: String) -> Result<TrimmedUser, NanoServic
         .await?
         .into();
 
-    #[cfg(feature = "core-postgres")]
+    #[cfg(feature = "reqwest")]
     let user: TrimmedUser = get_user_by_unique_id_api_call(id).await?.into();
 
-    Ok(user);
+    Ok(user)
 }
 
 #[cfg(feature = "reqwest")]
