@@ -9,6 +9,7 @@ members = [
     "nanoservices/auth/dal",
     "nanoservices/auth/kernel",
     "nanoservices/to_do/dal",
+    "nanoservices/user-session-cache/cache-module",
     "nanoservices/to_do/networking/actix_server",
     "nanoservices/auth/networking/actix_server",
     "ingress/frontend/to_do/rust-interface",
