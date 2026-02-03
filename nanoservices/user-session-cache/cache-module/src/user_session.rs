@@ -1,5 +1,5 @@
 use chrono::{DateTime, NaiveDateTime, Utc};
-use redis_module::{Context, RedisError, RedisResult, RedisString};
+use redis_module::{Context, RedisError, RedisResult, RedisString, RedisValue};
 
 pub struct UserSession {
     pub user_id: String,
@@ -17,7 +17,50 @@ impl UserSession {
     }
 
     pub fn check_timeout(&mut self, ctx: &Context) -> RedisResult {
-        todo!()
+        let key_string = RedisString::create(None, self.key.clone());
+        let key = ctx.open_key_writable(&key_string);
+        let last_interacted_string = match key.hash_get("last_interacted")? {
+            Some(v) => match NaiveDateTime::parse_from_str(&v.to_string(), "%Y-%m-%d %H:%M:%S") {
+                Ok(v) => v,
+                Err(e) => {
+                    println!("Could not parse date: {:?}", e);
+                    return Err(RedisError::Str("Could not parse date"));
+                }
+            },
+            None => return Err(RedisError::Str("Last interacted field does not exist")),
+        };
+
+        let timeout_mins = match key.hash_get("timeout_mins")? {
+            Some(v) => v.to_string().parse::<i32>().unwrap(),
+            None => return Err(RedisError::Str("Timeout mins field does not exist")),
+        };
+
+        let time_diff = self
+            .session_datetime
+            .naive_utc()
+            .signed_duration_since(last_interacted_string)
+            .num_minutes();
+
+        if time_diff > timeout_mins.into() {
+            match key.delete() {
+                Ok(_) => {}
+                Err(_) => return Err(RedisError::Str("Could not delete key")),
+            };
+            return Ok(RedisValue::SimpleStringStatic("TIMEOUT"));
+        }
+
+        let mut counter = match self.get_counter(ctx)? {
+            RedisValue::Integer(v) => v,
+            _ => return Err(RedisError::Str("Could not get counter")),
+        };
+
+        counter += 1;
+        key.hash_set("counter", ctx.create_string(counter.to_string()));
+        if counter > 20 {
+            return Ok(RedisValue::SimpleStringStatic("REFRESH"));
+        }
+
+        Ok(RedisValue::SimpleStringStatic("Ok"))
     }
 
     pub fn update_last_interacted(&self, ctx: &Context) -> RedisResult {
