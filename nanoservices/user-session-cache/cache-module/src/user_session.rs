@@ -64,10 +64,27 @@ impl UserSession {
     }
 
     pub fn update_last_interacted(&self, ctx: &Context) -> RedisResult {
-        todo!()
+        let key_string = RedisString::create(None, self.key.clone());
+        let key = ctx.open_key_writable(&key_string);
+        let formatted_date_string = self
+            .session_datetime
+            .format("%Y-%m-%d %H:%M:%S")
+            .to_string();
+
+        let last_interacted_string = RedisString::create(None, formatted_date_string);
+        key.hash_set("last_interacted", ctx.create_string(last_interacted_string));
+        Ok(RedisValue::SimpleStringStatic("OK"))
     }
 
     pub fn get_counter(&self, ctx: &Context) -> RedisResult {
-        todo!()
+        let key_string = RedisString::create(None, self.key.clone());
+        let key = ctx.open_key_writable(&key_string);
+        match key.hash_get("counter")? {
+            Some(v) => {
+                let v = v.to_string().parse::<i64>().unwrap();
+                Ok(RedisValue::Integer(v))
+            }
+            None => Err(RedisError::Str("Counter field does not exist")),
+        }
     }
 }
