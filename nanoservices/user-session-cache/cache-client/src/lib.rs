@@ -61,3 +61,46 @@ pub async fn logout(address: &str, user_id: &str) -> Result<String, Box<dyn Erro
     let result_string = unpack_result_string(result)?;
     Ok(result_string)
 }
+
+#[derive(Debug)]
+pub enum UserSessionStatus {
+    Ok(i32),
+    Refresh,
+}
+
+pub async fn update(address: &str, user_id: &str) -> Result<UserSessionStatus, NanoServiceError> {
+    let mut connection = get_connection(address).await?;
+    let result = connection
+        .req_packed_command(&redis::cmd("update.set").arg(user_id).clone())
+        .await
+        .map_err(|e| NanoServiceError::new(e.to_string(), NanoServiceErrorStatus::Unknown))?;
+    let result_string = unpack_result_string(result)?;
+
+    match result_string.as_str() {
+        "TIMEOUT" => {
+            return Err(NanoServiceError::new(
+                "Session has timed out".to_string(),
+                NanoServiceErrorStatus::Unauthorized,
+            ));
+        }
+        "NOT_FOUND" => {
+            return Err(NanoServiceError::new(
+                "Session not found".to_string(),
+                NanoServiceErrorStatus::Unauthorized,
+            ));
+        }
+        "REFRESH" => return Ok(UserSessionStatus::Refresh),
+        _ => {}
+    }
+
+    let perm_user_id = match result_string.parse::<i32>() {
+        Ok(perm_user_id) => perm_user_id,
+        Err(_) => {
+            return Err(NanoServiceError::new(
+                "Error converting the result into a string".to_string(),
+                NanoServiceErrorStatus::Unknown,
+            ));
+        }
+    };
+    Ok(UserSessionStatus::Ok(perm_user_id))
+}
