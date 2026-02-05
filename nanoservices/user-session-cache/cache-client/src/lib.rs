@@ -24,3 +24,40 @@ fn unpack_result_string(result: Value) -> Result<String, NanoServiceError> {
         )),
     }
 }
+
+pub async fn login(
+    address: &str,
+    user_id: &str,
+    timeout_mins: usize,
+    perm_user_id: i32,
+) -> Result<(), NanoServiceError> {
+    let mut connection = get_connection(address).await?;
+    let result = connection
+        .req_packed_command(
+            &redis::cmd("login.set")
+                .arg(user_id)
+                .arg(timeout_mins)
+                .arg(perm_user_id.to_string())
+                .clone(),
+        )
+        .await
+        .map_err(|e| NanoServiceError::new(e.to_string(), NanoServiceErrorStatus::Unknown))?;
+
+    match result {
+        Value::Okay => Ok(()),
+        _ => Err(NanoServiceError::new(
+            format!("{:?}", result),
+            NanoServiceErrorStatus::Unknown,
+        )),
+    }
+}
+
+pub async fn logout(address: &str, user_id: &str) -> Result<String, Box<dyn Error>> {
+    let mut connection = get_connection(address).await?;
+    let result = connection
+        .req_packed_command(&redis::cmd("logout.set").arg(user_id).clone())
+        .await
+        .map_err(|e| NanoServiceError::new(e.to_string(), NanoServiceErrorStatus::Unknown))?;
+    let result_string = unpack_result_string(result)?;
+    Ok(result_string)
+}
