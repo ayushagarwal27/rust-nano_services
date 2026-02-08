@@ -1,7 +1,6 @@
 use super::super::descriptors::SqlxPostGresDescriptor;
 use crate::connections::sqlx_postgres::SQLX_POSTGRES_POOL;
 use crate::users::schema::User;
-use argon2::password_hash::Output;
 use glue::errors::{NanoServiceError, NanoServiceErrorStatus};
 use std::future::Future;
 

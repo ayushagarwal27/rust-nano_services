@@ -1,9 +1,6 @@
-use crate::{
-    connections::sqlx_postgres,
-    to_do_items::schema::{NewToDoItem, ToDoItem},
-};
+use crate::to_do_items::schema::{NewToDoItem, ToDoItem};
 use glue::errors::NanoServiceError;
-use std::{future::Future, process::Output};
+use std::future::Future;
 
 #[cfg(feature = "json-file")]
 use super::super::descriptors::JsonFileDescriptor;

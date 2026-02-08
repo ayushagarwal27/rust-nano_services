@@ -1,10 +1,10 @@
-#[cfg(any(feature = "auth-core", feature = "reqwest"))]
+#[cfg(any(feature = "core-postgres", feature = "http"))]
 mod common_imports {
     pub use auth_dal::users::schema::TrimmedUser;
     pub use glue::errors::NanoServiceError;
 }
 
-#[cfg(feature = "auth-core")]
+#[cfg(feature = "core-postgres")]
 mod core_imports {
     pub use auth_core::api::users::get::get_by_unique_id as get_by_unique_id_core;
     pub use auth_dal::users::descriptors::SqlxPostGresDescriptor;
@@ -24,20 +24,24 @@ use core_imports::*;
 #[cfg(feature = "http")]
 use reqwest_imports::*;
 
-#[cfg(any(feature = "auth-core", feature = "reqwest"))]
+#[cfg(any(feature = "core-postgres", feature = "http"))]
 pub async fn get_user_by_unique_id(id: String) -> Result<TrimmedUser, NanoServiceError> {
-    #[cfg(feature = "auth-core")]
-    let user: TrimmedUser = get_by_unique_id_core::<SqlxPostGresDescriptor>(id)
-        .await?
-        .into();
+    #[cfg(feature = "core-postgres")]
+    {
+        let user: TrimmedUser = get_by_unique_id_core::<SqlxPostGresDescriptor>(id)
+            .await?
+            .into();
+        return Ok(user);
+    }
 
-    #[cfg(feature = "reqwest")]
-    let user: TrimmedUser = get_user_by_unique_id_api_call(id).await?.into();
-
-    Ok(user)
+    #[cfg(feature = "http")]
+    {
+        let user: TrimmedUser = get_user_by_unique_id_api_call(id).await?;
+        return Ok(user);
+    }
 }
 
-#[cfg(feature = "reqwest")]
+#[cfg(feature = "http")]
 async fn get_user_by_unique_id_api_call(id: String) -> Result<TrimmedUser, NanoServiceError> {
     let url = std::env::var("AUTH_API_URL")
         .map_err(|e| NanoServiceError::new(e.to_string(), NanoServiceErrorStatus::BadRequest))?;
@@ -57,11 +61,11 @@ async fn get_user_by_unique_id_api_call(id: String) -> Result<TrimmedUser, NanoS
         let trimmed_user = response.json::<TrimmedUser>().await.map_err(|e| {
             NanoServiceError::new(e.to_string(), NanoServiceErrorStatus::BadRequest)
         })?;
-        Ok(trimmed_user);
+        Ok(trimmed_user)
     } else {
-        return Err(NanoServiceError::new(
+        Err(NanoServiceError::new(
             format!("Failed to get user: {}", response.status()),
             NanoServiceErrorStatus::BadRequest,
-        ));
+        ))
     }
 }

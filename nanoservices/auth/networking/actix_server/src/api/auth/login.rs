@@ -2,10 +2,20 @@ use crate::extract_auth::extract_credentials;
 use actix_web::{HttpRequest, HttpResponse};
 use auth_core::api::auth::login::login as core_login;
 use auth_dal::users::transactions::get::GetByEmail;
-use glue::errors::NanoServiceError;
+use auth_kernel::user_session::transactions::login::LoginUserSession;
+use glue::errors::{NanoServiceError, NanoServiceErrorStatus};
 
-pub async fn login<T: GetByEmail>(req: HttpRequest) -> Result<HttpResponse, NanoServiceError> {
+pub async fn login<T: GetByEmail, X: LoginUserSession>(
+    req: HttpRequest,
+) -> Result<HttpResponse, NanoServiceError> {
     let credentials = extract_credentials(req).await?;
-    let token = core_login::<T>(credentials.email, credentials.password).await?;
+    let token = core_login::<T>(credentials.email.clone(), credentials.password).await?;
+    let user = T::get_by_email(credentials.email).await?;
+
+    let url = std::env::var("CACHE_API_URL")
+        .map_err(|e| NanoServiceError::new(e.to_string(), NanoServiceErrorStatus::Unknown))?;
+
+    X::login_user_session(&url, &user.unique_id, 20, user.id).await?;
+
     Ok(HttpResponse::Ok().json(token))
 }

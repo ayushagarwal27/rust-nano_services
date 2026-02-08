@@ -1,4 +1,4 @@
-use crate::user_session::{self, UserSession};
+use crate::user_session::UserSession;
 use redis_module::{Context, NextArg, RedisError, RedisResult, RedisString, RedisValue};
 
 pub fn update(ctx: &Context, args: Vec<RedisString>) -> RedisResult {

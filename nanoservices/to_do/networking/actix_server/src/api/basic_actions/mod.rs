@@ -1,4 +1,4 @@
-use actix_web::web::{self, scope, ServiceConfig};
+use actix_web::web::{self, ServiceConfig};
 use auth_kernel::user_session::descriptors::RedisSessionDescriptor;
 use to_do_dal::to_do_items::descriptors::SqlxPostGresDescriptor;
 
