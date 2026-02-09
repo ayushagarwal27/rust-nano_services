@@ -10,5 +10,6 @@ pub fn auth_factory(app: &mut ServiceConfig) {
     app.route(
         "/auth/login",
         get().to(login::login::<SqlxPostGresDescriptor, RedisSessionDescriptor>),
-    );
+    )
+    .route("/auth/logout", get().to(logout::logout));
 }
