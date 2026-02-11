@@ -11,3 +11,4 @@ auth-dal = { path = "../../dal" }
 auth-kernel = { path = "../../kernel", features = ["core-postgres"], default-features = false }
 glue = { path = "../../../../glue", features = ["actix"] }
 base64 = "0.22.1"
+actix-cors="0.7.0"

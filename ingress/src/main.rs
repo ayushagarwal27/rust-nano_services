@@ -4,6 +4,7 @@ use actix_web::{web, App, HttpRequest, HttpResponse, HttpServer, Responder};
 use rust_embed::RustEmbed;
 
 use actix_cors::Cors;
+use glue::logger::{logger::init_logger, network_wrappers::actix_web::ActixLogger};
 use to_do_dal::migrations::run_migrations as run_to_do_migrations;
 use to_do_server::api::views_factory as to_do_views_factory;
 
@@ -61,6 +62,7 @@ async fn catch_all(req: HttpRequest) -> impl Responder {
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
     dotenvy::dotenv().ok();
+    init_logger();
     run_to_do_migrations().await;
     run_auth_migrations().await;
     HttpServer::new(|| {
@@ -70,12 +72,13 @@ async fn main() -> std::io::Result<()> {
             .allow_any_header();
 
         App::new()
-            .wrap(cors)
+            .wrap(ActixLogger)
             .service(
                 web::scope("/api/v1")
                     .configure(to_do_views_factory)
                     .configure(auth_views_factory),
             )
+            .wrap(cors)
             .default_service(web::route().to(catch_all))
     })
     .bind("0.0.0.0:8002")?

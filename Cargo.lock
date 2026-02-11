@@ -346,6 +346,7 @@ checksum = "1505bd5d3d116872e7271a6d4e16d81d0c8570876c8de68093a09ac269d8aac0"
 name = "auth-actix-server"
 version = "0.1.0"
 dependencies = [
+ "actix-cors",
  "actix-web",
  "auth-core",
  "auth-dal",
@@ -1537,6 +1538,7 @@ dependencies = [
  "auth-actix-server",
  "auth-dal",
  "dotenvy",
+ "glue",
  "mime_guess",
  "rust-embed",
  "to-do-actix-server",
@@ -3225,6 +3227,7 @@ checksum = "1f3ccbac311fea05f86f61904b462b55fb3df8837a366dfc601a0161d0532f20"
 name = "to-do-actix-server"
 version = "0.1.0"
 dependencies = [
+ "actix-cors",
  "actix-web",
  "auth-kernel",
  "glue",
