@@ -9,6 +9,6 @@ actix-web = "4.5.1"
 auth-core = { path = "../../core" }
 auth-dal = { path = "../../dal" }
 auth-kernel = { path = "../../kernel", features = ["core-postgres"], default-features = false }
-glue = { path = "../../../../glue", features = ["actix"] }
+glue = { path = "../../../../glue", features = ["actix","elastic-logger"] }
 base64 = "0.22.1"
 actix-cors="0.7.0"

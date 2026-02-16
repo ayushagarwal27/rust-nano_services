@@ -1312,6 +1312,7 @@ dependencies = [
  "http-body-util",
  "hyper 1.8.1",
  "jsonwebtoken",
+ "once_cell",
  "reqwest",
  "rocket",
  "serde",

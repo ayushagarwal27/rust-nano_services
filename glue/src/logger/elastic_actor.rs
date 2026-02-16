@@ -1,12 +1,13 @@
 use chrono::Utc;
-use once_cell::sync::Lazy;
 use reqwest::{Body, Client};
 use serde::Serialize;
 use serde_json::json;
+use std::sync::LazyLock as Lazy;
 use tokio::sync::mpsc;
 use tokio::sync::mpsc::{Receiver, Sender};
 
-struct Message {
+#[derive(Debug, Serialize)]
+struct LogMessage {
     level: String,
     message: String,
 }
