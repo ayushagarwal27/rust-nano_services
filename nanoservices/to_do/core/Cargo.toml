@@ -10,6 +10,9 @@ serde = { version="1.0.197", features = ["derive"]}
 glue={path = "../../../glue"}
 auth-kernel = { path = "../../auth/kernel" }
 
+[dev-dependencies]
+tokio = { version = "1.39.1", features = ["full"] }
+
 [features]
 memory = ["auth-kernel/core-postgres"]
 http = ["auth-kernel/http"]
