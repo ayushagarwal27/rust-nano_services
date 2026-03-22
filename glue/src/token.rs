@@ -1,3 +1,5 @@
+use crate::errors::{NanoServiceError, NanoServiceErrorStatus};
+
 #[cfg(feature = "actix")]
 use actix_web::{dev::Payload, FromRequest, HttpRequest};
 
@@ -5,9 +7,6 @@ use actix_web::{dev::Payload, FromRequest, HttpRequest};
 use futures::future::{err, ok, Ready};
 use jsonwebtoken::{decode, encode, Algorithm, DecodingKey, EncodingKey, Header, Validation};
 use serde::{Deserialize, Serialize};
-
-#[cfg(feature = "actix")]
-use crate::errors::{NanoServiceError, NanoServiceErrorStatus};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct HeaderToken {

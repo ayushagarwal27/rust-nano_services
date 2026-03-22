@@ -2,3 +2,4 @@
 **/node_modules/
 /ingress/frontend/public
 **.env
+.DS_Store

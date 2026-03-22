@@ -3692,9 +3692,11 @@ name = "to-do-actix-server"
 version = "0.1.0"
 dependencies = [
  "actix-cors",
+ "actix-http",
  "actix-web",
  "auth-kernel",
  "glue",
+ "serde_json",
  "to-do-core",
  "to-do-dal",
  "tokio",
@@ -3709,6 +3711,7 @@ dependencies = [
  "glue",
  "serde",
  "to-do-dal",
+ "tokio",
 ]
 
 [[package]]
